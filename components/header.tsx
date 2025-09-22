@@ -10,7 +10,7 @@ import { ThemeToggle } from "./theme-toggle";
 
 const navLinks = [
     { href: "/agendar", label: "Agendar" },
-    // Adicione futuros links aqui, como "/cursos"
+    { href: "/cursos", label: "Cursos" },
 ];
 
 export function Header() {
