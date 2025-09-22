@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { Resolver, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -35,7 +35,7 @@ export const CourseForm: React.FC<CourseFormProps> = ({ initialData, onClose }) 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<CourseFormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema) as Resolver<CourseFormValues>,
     defaultValues: {
       title: initialData?.title || "",
       description: initialData?.description ?? "",

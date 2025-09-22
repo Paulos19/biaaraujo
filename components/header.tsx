@@ -11,6 +11,7 @@ import { ThemeToggle } from "./theme-toggle";
 const navLinks = [
     { href: "/agendar", label: "Agendar" },
     { href: "/cursos", label: "Cursos" },
+    { href: "/turmas", label: "Cursos Presenciais" }
 ];
 
 export function Header() {

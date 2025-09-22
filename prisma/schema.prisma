@@ -125,22 +125,26 @@ model Product {
 
 model CourseClass {
   id                  String   @id @default(cuid())
-  name                String   // Ex: "Turma de Penteados - Outubro"
+  name                String
   description         String?  @db.Text
   price               Decimal  @db.Decimal(10, 2)
-  enrollmentDeadline  DateTime // Prazo para inscrição
+  enrollmentDeadline  DateTime
+  
+  // CAMPOS ADICIONADOS
+  vacancies           Int      @default(0) // Total de vagas na turma
   
   // Relações
   enrollments         CourseEnrollment[]
 }
 
+// Opcional, mas recomendado: Adicionar um campo de status na inscrição
 model CourseEnrollment {
   id        String      @id @default(cuid())
   userId    String
   user      User        @relation(fields: [userId], references: [id])
   classId   String
-  courseClass CourseClass @relation(fields: [classId], references: [id])
+  courseClass CourseClass @relation(fields: [classId], references: [id], onDelete: Cascade) // Adicionado onDelete
   enrolledAt DateTime   @default(now())
 
-  @@unique([userId, classId]) // Garante que um usuário só se inscreva uma vez
+  @@unique([userId, classId])
 }

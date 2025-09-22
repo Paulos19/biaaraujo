@@ -4,7 +4,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Home, List, Calendar, GanttChartSquare, ChevronsLeft, ChevronsRight, GraduationCap } from "lucide-react";
+import { Home, List, Calendar, GanttChartSquare, ChevronsLeft, ChevronsRight, GraduationCap, Package, Users } from "lucide-react";
 
 import { useSidebar } from "@/hooks/use-sidebar";
 import { cn } from "@/lib/utils";
@@ -15,6 +15,8 @@ const navItems = [
   { href: "/admin/dashboard/servicos", label: "Serviços", icon: List },
   { href: "/admin/dashboard/agenda", label: "Agenda", icon: Calendar },
   { href: "/admin/dashboard/cursos", label: "Cursos", icon: GraduationCap },
+  { href: "/admin/dashboard/produtos", label: "Produtos", icon: Package },
+  { href: "/admin/dashboard/turmas", label: "Turmas", icon: Users },
 ];
 
 export function Sidebar() {
