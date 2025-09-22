@@ -1,0 +1,146 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ENUMs para controle de tipos e status
+enum UserRole {
+  ADMIN
+  CLIENT
+}
+
+enum AppointmentStatus {
+  AVAILABLE
+  BOOKED
+  CANCELED
+}
+
+// Modelo de Usuário e Autenticação (Next-Auth)
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          UserRole  @default(CLIENT)
+  accounts      Account[]
+  sessions      Session[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relações
+  appointments  Appointment[] // Agendamentos feitos pelo cliente
+  enrollments   CourseEnrollment[] // Inscrições em turmas
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// Modelo para Cursos/Aulas (Conteúdo em Vídeo)
+model Course {
+  id          String   @id @default(cuid())
+  title       String
+  description String?  @db.Text
+  youtubeUrl  String   // Link do vídeo do YouTube
+  published   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Modelo para Serviços oferecidos no salão
+model Service {
+  id          String    @id @default(cuid())
+  name        String
+  description String?   @db.Text
+  price       Decimal   @db.Decimal(10, 2)
+  duration    Int       // Duração em minutos
+  
+  // Relações
+  appointments Appointment[]
+}
+
+// Modelo para Horários e Agendamentos
+model Appointment {
+  id        String   @id @default(cuid())
+  date      DateTime // Dia do agendamento
+  startTime DateTime // Horário de início
+  endTime   DateTime // Horário de fim
+  status    AppointmentStatus @default(AVAILABLE)
+
+  // Relações
+  clientId  String? // Opcional, preenchido quando um cliente agenda
+  client    User?   @relation(fields: [clientId], references: [id])
+  serviceId String  // O serviço que está sendo agendado
+  service   Service @relation(fields: [serviceId], references: [id])
+}
+
+// Modelo para Venda de Produtos ou Cursos Presenciais (Turmas)
+model Product {
+  id          String @id @default(cuid())
+  name        String
+  description String? @db.Text
+  price       Decimal @db.Decimal(10, 2)
+  stock       Int @default(0)
+}
+
+model CourseClass {
+  id                  String   @id @default(cuid())
+  name                String   // Ex: "Turma de Penteados - Outubro"
+  description         String?  @db.Text
+  price               Decimal  @db.Decimal(10, 2)
+  enrollmentDeadline  DateTime // Prazo para inscrição
+  
+  // Relações
+  enrollments         CourseEnrollment[]
+}
+
+model CourseEnrollment {
+  id        String      @id @default(cuid())
+  userId    String
+  user      User        @relation(fields: [userId], references: [id])
+  classId   String
+  courseClass CourseClass @relation(fields: [classId], references: [id])
+  enrolledAt DateTime   @default(now())
+
+  @@unique([userId, classId]) // Garante que um usuário só se inscreva uma vez
+}
